@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Team;
 
-class TeamsTableSeeder extends Seeder
+class StandingsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,23 +12,23 @@ class TeamsTableSeeder extends Seeder
     public function run()
     {
         $team = new Team();
-        $team->team_name = 'Team 1';
+        $team->team_id = '1';
         $team->save();
 
         $team = new Team();
-        $team->team_name = 'Team 2';
+        $team->team_id = '2';
         $team->save();
 
         $team = new Team();
-        $team->team_name = 'Team 3';
+        $team->team_id = '3';
         $team->save();
 
         $team = new Team();
-        $team->team_name = 'Team 4';
+        $team->team_id = '4';
         $team->save();
 
         $team = new Team();
-        $team->team_name = 'Team 5';
+        $team->team_id = '5';
         $team->save();
     }
 }

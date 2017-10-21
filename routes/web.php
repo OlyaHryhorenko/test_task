@@ -13,3 +13,5 @@
 
 Route::get('/', 'TeamController@index');
 Route::post('/new-team', ['uses'=>'TeamController@store', 'as' => 'team.new']);
+
+Route::get('/team/{id}', ['uses'=>'TeamController@show', 'as' => 'team.show']);

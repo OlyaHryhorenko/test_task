@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Team;
+use App\Standing;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -55,7 +56,8 @@ class TeamController extends Controller
     public function show($id)
     {
         $team = Team::find($id);
-        return  response()->json(['team'=> $team]);
+        $team_data = Standing::where('team_id', $id)->get();
+        return  response()->json(['team'=> $team, 'team_data' => $team_data]);
     }
 
     /**
