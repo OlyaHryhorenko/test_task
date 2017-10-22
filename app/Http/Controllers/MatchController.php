@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Match;
 use App\Team;
-use App\Standing;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Http\Response;
 
-class TeamController extends Controller
+class MatchController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,20 +16,16 @@ class TeamController extends Controller
      */
     public function index()
     {
+        $matches = Match::all();
         $teams = Team::all();
+        $matches_without_results = Match::where('host_team_result', '=', NULL)
+            ->where('guest_team_result','=', NULL)->get();
         return view('index')
-            ->with(['teams'=>$teams]);
+            ->with(['matches'=> $matches])
+            ->with(['teams' => $teams])
+            ->with(['matches_without_results' => $matches_without_results]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -38,17 +33,29 @@ class TeamController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    private  function validate_match_request(Request $request){
+        if ($request->host_team == $request->guest_team)
+        {
+            return '0';
+        }else {
+            return '1';
+        }
+    }
+
     public function store(Request $request)
     {
-
-        $this->validate($request, [
-            'team_name' => 'required|max:255'
-        ]);
-
-        $team = new Team();
-        $team->team_name = $request->team_name;
-        $team->save();
-        return response()->json(['success'=> 'Team added']);
+        $validate = $this->validate_match_request($request);
+        if ($validate == '1')
+        {
+            $match = new Match();
+            $match->host_team_id = $request->host_team;
+            $match->guest_team_id = $request->guest_team;
+            $match->match_date = $request->date;
+            $match->save();
+            return response()->json(['success' => 'Match saved']);
+        } else {
+            return response()->json(['error' => 'Mistake']);
+        }
     }
 
     /**
@@ -59,9 +66,7 @@ class TeamController extends Controller
      */
     public function show($id)
     {
-        $team = Team::find($id);
-        $team_data = Standing::where('team_id', $id)->get();
-        return response()->json(['team'=> $team, 'team_data' => $team_data]);
+        //
     }
 
     /**
@@ -95,9 +100,6 @@ class TeamController extends Controller
      */
     public function destroy($id)
     {
-        $team = Team::find($id);
-        $team->delete();
-        Session::flash('message', 'Teams deleted');
-        return redirect()->back();
+        //
     }
 }

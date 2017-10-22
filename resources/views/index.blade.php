@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>Laravel</title>
 
@@ -12,6 +13,9 @@
 
         <!-- Styles -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link  rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker-standalone.min.css" />
         <style>
             html, body {
                 background-color: #fff;
@@ -81,20 +85,23 @@
                 <div class="tab-content">
                     <div id="home" class="tab-pane fade in active">
                         <h3>Upcoming matches</h3>
-                        <table class="table table-bordered">
+                        <table class="table table-bordered datatable">
                             <thead>
                                 <th>#</th>
-                                <th>Team Name</th>
-                                <th>Match Timetable</th>
-                                <th>Action</th>
+                                <th>Host Team</th>
+                                <th>Score</th>
+                                <th>Guest Team</th>
+
                             </thead>
                             <tbody>
-                            @forelse($teams as $team)
+                            @forelse($matches as $match)
                                 <tr>
+
                                     <td>{{$loop->iteration}}</td>
-                                    <td><a href="#" class="team_title" data-id="{{$team->id}}">{{$team->team_name}}</a></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td><a href="#" class="team_title" data-id="{{$match->id}}">{{$match->host_team->team_name}}</a></td>
+                                    <td>{{$match->host_team_result}} : {{$match->guest_team_result}}</td>
+                                    <td><a href="#" class="team_title" data-id="{{$match->id}}">{{$match->guest_team->team_name}}</a></td>
+
                                 </tr>
                             @empty
                                 <p>No team yet. Add one</p>
@@ -104,7 +111,74 @@
                     </div>
                     <div id="menu1" class="tab-pane fade">
                         <h3>Admin Settins</h3>
-                        <p>Some content in menu 1.</p>
+                        <div class="card">
+                            <div class="card-block">
+                                <h4 class="card-title">Add new match</h4>
+                                <form id="form_new_match">
+                                    <div class="form-group col-md-6">
+                                        <label>Choose host team</label>
+                                       <select class="form-control" name="host_team" id="host_team" required>
+                                           @foreach($teams as $team)
+                                               <option value="{{$team->id}}">{{$team->team_name}}</option>
+                                           @endforeach
+                                       </select>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Choose guest team</label>
+                                        <select class="form-control" name="guest_team" id="guest_team" required>
+                                            @foreach($teams as $team)
+                                                <option value="{{$team->id}}">{{$team->team_name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Select match date</label>
+                                        <input type="text"  id='datetimepicker' name="date" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <input class="btn btn-success" type="submit" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-block">
+                                <h4 class="card-title">Add new team</h4>
+                                <form id="add-team">
+                                    <div class="form-group">
+                                        <input type="text" name="team_name" id="team_name" placeholder="Add team nameW">
+                                    </div>
+                                    <div class="form-group">
+                                        <input class="btn btn-success" type="submit" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-block">
+                                <h4 class="card-title">Add match results</h4>
+                                <form>
+                                    <div class="form-group col-md-12">
+                                        <select name="match" class="form-control">
+                                                @foreach($matches_without_results as $match_without_result)
+                                                    <option value="{{$match_without_result->id}}">{{$match_without_result->host_team->team_name}}:{{$match_without_result->guest_team->team_name}} ({{$match_without_result->match_date}})</option>
+                                                @endforeach
+                                        </select>
+                                    </div>
+                                        <div class="form-group col-md-6">
+                                            <input type="number" placeholder="Host team goals" class="form-control" id="host_team_goals">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <input type="number" placeholder="Guest team goals" class="form-control"  id="guest_team_goals">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <input class="btn btn-success" type="submit" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -153,20 +227,29 @@
                 src="https://code.jquery.com/jquery-2.2.4.min.js"
                 integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
                 crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script>
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         $(document).ready(function(){
             $('[data-toggle="tooltip"]').tooltip();
-        });
-        $('.team_title').click(function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            var id = $this.data('id');
-            axios.get('/team/'+id)
-                .then(function (response) {
-                    console.log(response['data']['team']['id']);
-                    $('.team_data tbody').append("<tr>"+
+
+            $('.datatable').dataTable({});
+            $('.team_title').click(function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var id = $this.data('id');
+                axios.get('/team/'+id)
+                    .then(function (response) {
+                        console.log(['data']['team_data']);
+                        if (['data']['team_data'] == undefined) {
+                            console.log('empty');
+                        } else {
+                            $('.team_data tbody').append("<tr>"+
                                 "<td>"+response['data']['team_data']['gp'] +"</td>"+
                                 "<td>"+response['data']['team_data']['w'] +"</td>"+
                                 "<td>"+response['data']['team_data']['d'] +"</td>"+
@@ -176,13 +259,60 @@
                                 "<td>"+response['data']['team_data']['gd'] +"</td>"+
                                 "<td>"+response['data']['team_data']['home'] +"</td>"+
                                 "<td>"+response['data']['team_data']['away'] +"</td>"+
-                        "</tr>")
+                                "</tr>")
+                        }
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                $("#info").modal();
+            })
+
+            $(function () {
+                $('#datetimepicker').datetimepicker();
+            });
+
+            $('#form_new_match').on('submit', function(e)
+            {
+                e.preventDefault();
+                var host_team = $(this).find('#host_team').val();
+                var guest_team = $(this).find('#guest_team').val();
+                var raw_date = $(this).find('#datetimepicker').val();
+                var date =new Date(raw_date).toISOString().substring(0, 19).replace('T', ' ')
+
+                axios.post('/add-match', {
+                    host_team: host_team,
+                    guest_team: guest_team,
+                    date: date
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
-            $("#info").modal();
-        })
+                    .then(function (response) {
+                        console.log();
+                        if (response['data']['error']) {
+                            alert(response['data']['error']);
+                        } else if (response['data']['success']) {
+                            alert(response['data']['success'])
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            })
+            $('#add-team').on('submit', function (e) {
+                e.preventDefault();
+                var team_name = $(this).find('#team_name').val();
+                axios.post('/add-team', {
+                    team_name: team_name
+                })
+                    .then(function (response) {
+                        alert(response['data']['success'])
+                    })
+                    .catch(function (error) {
+                        alert('The value must not be empty')
+                    });
+            })
+        });
+
     </script>
     </body>
 </html>
