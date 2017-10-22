@@ -47,7 +47,11 @@ class TeamController extends Controller
 
         $team = new Team();
         $team->team_name = $request->team_name;
+
         $team->save();
+        $standing = new Standing();
+        $standing->team_id = $team->id;
+        $standing->save();
         return response()->json(['success'=> 'Team added']);
     }
 

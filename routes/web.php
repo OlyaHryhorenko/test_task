@@ -16,3 +16,4 @@ Route::post('/add-team', ['uses'=>'TeamController@store', 'as' => 'team.new']);
 
 Route::get('/team/{id}', ['uses'=>'TeamController@show', 'as' => 'team.show']);
 Route::post('/add-match', ['uses'=>'MatchController@store', 'as' => 'match.new']);
+Route::post('/add-match-results', ['uses'=>'MatchController@update', 'as' => 'match.update']);

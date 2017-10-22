@@ -111,42 +111,44 @@
                     </div>
                     <div id="menu1" class="tab-pane fade">
                         <h3>Admin Settins</h3>
-                        <div class="card">
+                        <div class="card clearfix">
                             <div class="card-block">
                                 <h4 class="card-title">Add new match</h4>
                                 <form id="form_new_match">
-                                    <div class="form-group col-md-6">
-                                        <label>Choose host team</label>
-                                       <select class="form-control" name="host_team" id="host_team" required>
-                                           @foreach($teams as $team)
-                                               <option value="{{$team->id}}">{{$team->team_name}}</option>
-                                           @endforeach
-                                       </select>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label>Choose guest team</label>
-                                        <select class="form-control" name="guest_team" id="guest_team" required>
-                                            @foreach($teams as $team)
-                                                <option value="{{$team->id}}">{{$team->team_name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label>Select match date</label>
-                                        <input type="text"  id='datetimepicker' name="date" required>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <input class="btn btn-success" type="submit" />
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label>Choose host team</label>
+                                           <select class="form-control" name="host_team" id="host_team" required>
+                                               @foreach($teams as $team)
+                                                   <option value="{{$team->id}}">{{$team->team_name}}</option>
+                                               @endforeach
+                                           </select>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Choose guest team</label>
+                                            <select class="form-control" name="guest_team" id="guest_team" required>
+                                                @foreach($teams as $team)
+                                                    <option value="{{$team->id}}">{{$team->team_name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Select match date</label>
+                                            <input type="text"  id='datetimepicker' name="date"  class="form-control" required>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <input class="btn btn-success" type="submit" />
+                                        </div>
                                     </div>
                                 </form>
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card clearfix">
                             <div class="card-block">
                                 <h4 class="card-title">Add new team</h4>
                                 <form id="add-team">
                                     <div class="form-group">
-                                        <input type="text" name="team_name" id="team_name" placeholder="Add team nameW">
+                                        <input type="text" name="team_name" id="team_name" class="form-control" placeholder="Add team nameW">
                                     </div>
                                     <div class="form-group">
                                         <input class="btn btn-success" type="submit" />
@@ -155,34 +157,36 @@
                             </div>
                         </div>
 
-                        <div class="card">
+                        <div class="card clearfix">
                             <div class="card-block">
                                 <h4 class="card-title">Add match results</h4>
-                                <form>
-                                    <div class="form-group col-md-12">
-                                        <select name="match" class="form-control">
-                                                @foreach($matches_without_results as $match_without_result)
-                                                    <option value="{{$match_without_result->id}}">{{$match_without_result->host_team->team_name}}:{{$match_without_result->guest_team->team_name}} ({{$match_without_result->match_date}})</option>
-                                                @endforeach
-                                        </select>
-                                    </div>
-                                        <div class="form-group col-md-6">
-                                            <input type="number" placeholder="Host team goals" class="form-control" id="host_team_goals">
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <input type="number" placeholder="Guest team goals" class="form-control"  id="guest_team_goals">
+                                <form id="add_match_result">
+                                    <div class="row">
+                                        <div class="form-group col-md-12">
+                                            <select name="match" class="form-control" id="match">
+                                                    @foreach($matches_without_results as $match_without_result)
+                                                        <option value="{{$match_without_result->id}}">{{$match_without_result->host_team->team_name}}:{{$match_without_result->guest_team->team_name}} ({{$match_without_result->match_date}})</option>
+                                                    @endforeach
+                                            </select>
                                         </div>
                                     </div>
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <input type="number" placeholder="Host team goals" class="form-control" id="host_team_goals">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <input type="number" placeholder="Guest team goals" class="form-control"  id="guest_team_goals">
+                                            </div>
+                                        </div>
                                     <div class="form-group">
                                         <input class="btn btn-success" type="submit" />
                                     </div>
+
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add team</button>
 
             </div>
 
@@ -297,7 +301,7 @@
                     .catch(function (error) {
                         console.log(error);
                     });
-            })
+            });
             $('#add-team').on('submit', function (e) {
                 e.preventDefault();
                 var team_name = $(this).find('#team_name').val();
@@ -309,6 +313,28 @@
                     })
                     .catch(function (error) {
                         alert('The value must not be empty')
+                    });
+            });
+            $('#add_match_result').on('submit', function(e) {
+                e.preventDefault();
+                var match_id = $(this).find('#match').val();
+                var host_goals = $(this).find('#host_team_goals').val();
+                var guest_goals = $(this).find('#guest_team_goals').val();
+                axios.post('/add-match-results', {
+                    match_id: match_id,
+                    host_goals: host_goals,
+                    guest_goals: guest_goals
+                })
+                    .then(function (response) {
+                        console.log();
+                        if (response['data']['error']) {
+                            alert(response['data']['error']);
+                        } else if (response['data']['success']) {
+                            alert(response['data']['success'])
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
                     });
             })
         });

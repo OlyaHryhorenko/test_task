@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Match;
 use App\Team;
+use App\Standing;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -87,9 +88,44 @@ class MatchController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $match = Match::where('id', $request->match_id)->first();
+        $match->host_team_result = $request->host_goals;
+        $match->guest_team_result = $request->guest_goals;
+
+
+//        //update host team standings
+        $host_team_standings = Standing::where('team_id', $match->host_team_id)->first();
+        $host_team_standings->gp += 1;
+//
+//        //update guest team standings
+        $guest_team_standings = Standing::where('team_id', $match->guest_team_id)->first();
+        $guest_team_standings->gp += 1;
+
+//        //update win results
+        if ($request->host_goals > $request->guest_goals) {
+            $host_team_standings->w += 1;
+            $host_team_standings->pts += 3;
+            $guest_team_standings->l += 1;
+            $guest_team_standings->pts += 1;
+        } else if ($request->host_goals < $request->guest_goals)
+        {
+
+            $host_team_standings->l += 1;
+            $host_team_standings->pts += 1;
+            $guest_team_standings->w += 1;
+            $guest_team_standings->pts += 3;
+        } else if ($request->host_goals == $request->guest_goals)
+        {
+            $host_team_standings->d += 1;
+            $guest_team_standings->d += 1;
+        }
+        $host_team_standings->save();
+        $guest_team_standings->save();
+        $match->save();
+
+        return response()->json(['success'=> "Results updated"]);
     }
 
     /**

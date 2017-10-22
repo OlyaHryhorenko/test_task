@@ -20,11 +20,8 @@ class CreateStandingsTable extends Migration
             $table->integer('w')->default(0);
             $table->integer('d')->default(0);
             $table->integer('l')->default(0);
-            $table->integer('gf')->default(0);
-            $table->integer('ga')->default(0);
-            $table->integer('gd')->default(0);
-            $table->string('home')->default('0-0-0');
-            $table->string('away')->default('0-0-0');
+            $table->integer('pts')->default(0);
+            $table->integer('mp')->default(0);
             $table->timestamps();
         });
     }

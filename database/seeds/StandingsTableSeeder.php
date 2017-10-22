@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\Standing;
 
 class StandingsTableSeeder extends Seeder
 {
@@ -11,24 +12,24 @@ class StandingsTableSeeder extends Seeder
      */
     public function run()
     {
-        $team = new Team();
-        $team->team_id = '1';
-        $team->save();
+        $standing = new Standing();
+        $standing->team_id = '1';
+        $standing->save();
 
-        $team = new Team();
-        $team->team_id = '2';
-        $team->save();
+        $standing = new Standing();
+        $standing->team_id = '2';
+        $standing->save();
 
-        $team = new Team();
-        $team->team_id = '3';
-        $team->save();
+        $standing = new Standing();
+        $standing->team_id = '3';
+        $standing->save();
 
-        $team = new Team();
-        $team->team_id = '4';
-        $team->save();
+        $standing = new Standing();
+        $standing->team_id = '4';
+        $standing->save();
 
-        $team = new Team();
-        $team->team_id = '5';
-        $team->save();
+        $standing = new Standing();
+        $standing->team_id = '5';
+        $standing->save();
     }
 }
